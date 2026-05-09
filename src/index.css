@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+body {
+  font-family: 'Inter', sans-serif;
+}
+/* Base Theme */
+:root {
+  --bg: #edeef0;
+  --surface: rgba(255,255,255,0.78);
+  --surface-solid: #ffffff;
+  --text: #0a0a0a;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --gold: #c7a74a;
+  --shadow-soft: 0 10px 30px rgba(0,0,0,0.06);
+}
+
+/* Global reset */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Reusable UI Classes */
+.container-app {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.glass-card {
+  background: var(--surface);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: var(--shadow-soft);
+}
+
+.section-title {
+  font-size: 3.4rem;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.btn-primary {
+  background: #0a0a0a;
+  color: white;
+  border-radius: 16px;
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.badge-gold {
+  color: #8b6b16;
+  background: rgba(199,167,74,0.14);
+  border: 1px solid rgba(199,167,74,0.18);
+}
+/* Inputs */
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.85);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:focus {
+  border-color: #9ca3af;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.04);
+}
