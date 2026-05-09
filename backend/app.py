@@ -9,16 +9,18 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-API_KEY = os.getenv("MY_API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
-@app.route("/api/data", methods=["GET"])
-def get_data():
-
-    response = requests.get(
-        "https://api.example.com/endpoint",
-        headers={"Authorization": f"Bearer {API_KEY}"}
+@app.route("/api/gemini", methods=["POST"])
+def gemini():
+    body = request.get_json()
+    
+    res = requests.post(
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={API_KEY}",
+        headers={"Content-Type": "application/json"},
+        json=body
     )
-    return jsonify(response.json())
+    return jsonify(res.json())
 
 if __name__ == "__main__":
     app.run(debug=True)

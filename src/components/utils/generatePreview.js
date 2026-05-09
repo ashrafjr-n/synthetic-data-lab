@@ -1,8 +1,8 @@
 /* ================= GEMINI CALL ================= */
 export const getSmartWeights = async (features, target) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-  if (!apiKey) return null;
+  if (!backendUrl) return null;
 
   /* CACHE */
   const cacheKey = JSON.stringify({
@@ -78,16 +78,13 @@ Also return a "positive_class" field: which of the target values represents the 
 `;
 
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }]
-        })
-      }
-    );
+    const res = await fetch(`${backendUrl}/api/gemini`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
 
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -177,11 +174,9 @@ export const generatePreview = async (features, rows, useSeed, seed, target) => 
   const numericWeights = {};
   features.filter(f => f.type === "numeric").forEach(f => {
     if (aiWeights?.numeric?.[f.name]) {
-      /* من الذكاء الاصطناعي */
       const { weight, confidence } = aiWeights.numeric[f.name];
       numericWeights[f.name] = weight * confidence;
     } else {
-      /* fallback عشوائي */
       numericWeights[f.name] = (random() * 2) - 1;
     }
   });
@@ -194,12 +189,10 @@ export const generatePreview = async (features, rows, useSeed, seed, target) => 
 
     vals.forEach(v => {
       if (aiWeights?.categorical?.[f.name]?.values?.[v] !== undefined) {
-        /* من الذكاء الاصطناعي مع الثقة */
         const score = aiWeights.categorical[f.name].values[v];
         const conf = aiWeights.categorical[f.name].confidence ?? 0.5;
         catWeights[f.name][v] = score * conf;
       } else {
-        /* fallback عشوائي */
         catWeights[f.name][v] = (random() * 2) - 1;
       }
     });
