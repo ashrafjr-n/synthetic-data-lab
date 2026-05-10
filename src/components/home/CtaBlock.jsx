@@ -95,7 +95,7 @@ const EXAMPLE_CONFIG = {
           <motion.button
             whileHover={{ scale: 1.04, y: -2, boxShadow: "0 16px 40px rgba(199,167,74,0.4)" }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => window.location.href = "/builder"}
+            onClick={() => navigate("/builder")}
             style={{
               background: "#c7a74a", color: "white", border: "none",
               borderRadius: "14px", padding: "16px 36px",
