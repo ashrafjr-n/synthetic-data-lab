@@ -115,6 +115,15 @@ Also return a "positive_class" field: which of the target values represents the 
   }
 };
 
+
+
+
+
+
+
+
+
+
 /* ================= HELPERS ================= */
 const getRandomFn = (useSeed, seededRandom) =>
   useSeed ? seededRandom() : Math.random();
@@ -152,6 +161,23 @@ const generateColumnValue = (feature, rowIndex, getRandom, getNormal) => {
 
   return null;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ================= MAIN EXPORT ================= */
 export const generatePreview = async (features, rows, useSeed, seed, target) => {
@@ -197,6 +223,19 @@ export const generatePreview = async (features, rows, useSeed, seed, target) => 
       }
     });
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   /* ================= GENERATE ROWS ================= */
   for (let i = 0; i < Number(rows); i++) {

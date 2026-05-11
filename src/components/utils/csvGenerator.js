@@ -15,7 +15,7 @@ export const generateCSV = (features, rows = 10) => {
       }
 
       if (f.type === "category" || f.type === "binary") {
-        const values = f.values.split(",");
+        const values = f.values.split(",").map(v => v.trim());
         return values[Math.floor(Math.random() * values.length)];
       }
 

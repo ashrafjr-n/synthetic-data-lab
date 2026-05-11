@@ -4,7 +4,7 @@ export function analyzeDataset(features = []) {
   let warnings = [];
 
   const numericCount = features.filter(f => f.type === "numeric").length;
-  const categoryCount = features.filter(f => f.type === "category").length;
+  // const categoryCount = features.filter(f => f.type === "category").length;
 
   // 1. Feature balance
   if (features.length === 0) {
