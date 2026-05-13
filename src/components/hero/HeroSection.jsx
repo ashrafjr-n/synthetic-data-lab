@@ -2,11 +2,14 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import PreviewModal from "../live/PreviewModal";
+import LogoTrail from "./LogoTrail";
+
 
 /* ─────────────────────────────────────────────
    HERO SECTION
 ───────────────────────────────────────────── */
 function HeroSection() {
+  const heroRef = useRef(null);
   const navigate = useNavigate();
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -14,6 +17,7 @@ function HeroSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
 const [showSample, setShowSample] = useState(false);
+const [heroReady, setHeroReady] = useState(false);
 
 const SAMPLE_DATA = Array.from({ length: 120 }, (_, i) => ({
   employee_id: i + 1,
@@ -50,13 +54,14 @@ const EXAMPLE_CONFIG = {
 
   return (
     <motion.div
-      ref={ref}
+      ref={(node) => { ref.current = node; heroRef.current = node; if (node && !heroReady) setHeroReady(true); }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
       className="relative min-h-[720px] flex flex-col justify-center"
-      style={{ overflow: "hidden" }}
+      style={{ overflow: "visible" }}
     >
+      <LogoTrail logoSrc="/favicon.png" containerRef={heroRef} />
       <motion.div
         style={{ y, opacity, padding: "0 56px" }}
         className="relative grid lg:grid-cols-2 gap-20 items-center"
