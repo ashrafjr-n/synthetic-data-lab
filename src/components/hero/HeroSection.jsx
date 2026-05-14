@@ -2,7 +2,6 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import PreviewModal from "../live/PreviewModal";
-import LogoTrail from "./LogoTrail";
 
 
 /* ─────────────────────────────────────────────
@@ -61,7 +60,6 @@ const EXAMPLE_CONFIG = {
       className="relative min-h-[720px] flex flex-col justify-center"
       style={{ overflow: "visible" }}
     >
-      <LogoTrail logoSrc="/favicon.png" containerRef={heroRef} />
       <motion.div
         style={{ y, opacity, padding: "0 56px" }}
         className="relative grid lg:grid-cols-2 gap-20 items-center"
