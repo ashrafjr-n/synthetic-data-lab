@@ -311,11 +311,6 @@ function TableView() {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "16px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{
-            width: "36px", height: "36px", borderRadius: "10px",
-            background: "#f8f8f6", border: "1px solid #eeeeea",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px",
-          }}>📊</div>
           <div>
             <p style={{ fontSize: "10px", color: "#b0b5bf", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
               Generated Dataset
@@ -549,11 +544,6 @@ function TerminalView({ visibleLines }) {
         {/* Header — matches TableView / DashboardView pattern */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "16px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{
-              width: "36px", height: "36px", borderRadius: "10px",
-              background: "#f8f8f6", border: "1px solid #eeeeea",
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px",
-            }}>⚙️</div>
             <div>
               <p style={{ fontSize: "10px", color: "#b0b5bf", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
                 Generation Log
