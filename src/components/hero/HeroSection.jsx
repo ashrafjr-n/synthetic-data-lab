@@ -518,16 +518,155 @@ function DashboardView() {
 }
 
 /* ─────────────────────────────────────────────
-   DOT PROGRESS NAVIGATOR
-   نقطتان مع ring يتملى تلقائياً — اضغط لتتنقل
+   VIEW C — TERMINAL
 ───────────────────────────────────────────── */
-const VIEWS = ["table", "dashboard"];
+const GOLD = "#c7a74a";
+
+const LOG_LINES = [
+  { t: 300,  text: "→ initializing seed #4821",         color: GOLD },
+  { t: 750,  text: "→ parsing feature schema...",        color: "rgba(230, 230, 230, 0.67)" },
+  { t: 1200, text: "✓ 9 features detected",             color: "#059668" },
+  { t: 1700, text: "→ applying AI relationship engine", color: "rgba(230, 230, 230, 0.67)" },
+  { t: 2300, text: "✓ causal patterns inferred",        color: "#059669" },
+  { t: 2900, text: "→ synthesizing 500 rows...",         color: "rgba(230, 230, 230, 0.67)" },
+  { t: 3600, text: "✓ dataset complete · export ready", color: GOLD },
+];
+
+function TerminalView({ visibleLines }) {
+  return (
+    <>
+      <style>{`
+        @keyframes termFadeIn {
+          from { opacity: 0; transform: translateX(-6px); }
+          to   { opacity: 1; transform: none; }
+        }
+        @keyframes termBlink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
+        }
+      `}</style>
+
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+
+        {/* Header — matches TableView / DashboardView pattern */}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "16px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{
+              width: "36px", height: "36px", borderRadius: "10px",
+              background: "#f8f8f6", border: "1px solid #eeeeea",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px",
+            }}>⚙️</div>
+            <div>
+              <p style={{ fontSize: "10px", color: "#b0b5bf", textTransform: "uppercase", letterSpacing: "0.14em", margin: 0 }}>
+                Generation Log
+              </p>
+              <p style={{ fontSize: "14px", fontWeight: "700", color: "#0a0a0a", margin: "3px 0 0", letterSpacing: "-0.01em" }}>
+                employee_churn
+              </p>
+            </div>
+          </div>
+          <div style={{
+            padding: "5px 12px", borderRadius: "100px",
+            background: "rgba(199,167,74,0.09)", border: "1px solid rgba(199,167,74,0.18)",
+            fontSize: "11px", color: "#9a7a28", fontWeight: "600", letterSpacing: "0.03em",
+          }}>
+            AI Engine
+          </div>
+        </div>
+
+        {/* Terminal body */}
+        <div style={{
+          flex: 1,
+          background: "rgba(4,3,2,0.88)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(199,167,74,0.12)",
+          borderRadius: "16px",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}>
+          {/* Mac-style title bar */}
+          <div style={{
+            padding: "11px 16px",
+            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            display: "flex", alignItems: "center", gap: "7px",
+            background: "rgba(255,255,255,0.02)",
+          }}>
+            {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
+              <div key={i} style={{
+                width: "9px", height: "9px", borderRadius: "50%",
+                background: c, opacity: 0.7,
+              }} />
+            ))}
+            <span style={{
+              marginLeft: "6px", fontSize: "11px",
+              color: "rgba(255,255,255,0.2)", letterSpacing: "0.06em",
+              fontFamily: "monospace",
+            }}>
+              synthiq — generation log
+            </span>
+          </div>
+
+          {/* Log lines */}
+          <div style={{
+            padding: "14px 16px",
+            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+            fontSize: "11.5px",
+            flex: 1,
+          }}>
+            {LOG_LINES.map((line, i) =>
+              visibleLines.includes(i) && (
+                <div key={i} style={{
+                  color: line.color,
+                  marginBottom: "5px",
+                  lineHeight: "1.6",
+                  animation: "termFadeIn 0.3s ease forwards",
+                }}>
+                  {line.text}
+                </div>
+              )
+            )}
+            <span style={{
+              color: GOLD, fontSize: "13px",
+              animation: "termBlink 0.9s step-end infinite",
+            }}>▋</span>
+          </div>
+        </div>
+
+        {/* Footer — same pattern as other views */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          paddingTop: "14px", borderTop: "1px solid #f3f4f6", marginTop: "14px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "11px", color: "#b0b5bf" }}>500 rows</span>
+            <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#d1d5db", display: "inline-block" }} />
+            <span style={{ fontSize: "11px", color: "#b0b5bf" }}>9 features</span>
+            <span style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#d1d5db", display: "inline-block" }} />
+            <span style={{ fontSize: "11px", color: "#b0b5bf" }}>seed #4821</span>
+          </div>
+          <motion.span
+            whileHover={{ color: "#9a7a28" }}
+            style={{ fontSize: "12px", color: "#c7a74a", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "4px", transition: "color 0.2s" }}
+          >
+            Export CSV ↓
+          </motion.span>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   DOT PROGRESS NAVIGATOR
+───────────────────────────────────────────── */
+const VIEWS = ["table", "dashboard", "terminal"];
+const VIEW_LABELS = { table: "TABLE VIEW", dashboard: "REPORT VIEW", terminal: "AI LOG" };
 const AUTO_MS = 5500;
 const RING_R = 7;
 const RING_CIRC = 2 * Math.PI * RING_R;
 
 function DotProgress({ active, progress, onDotClick }) {
-  const labels = { table: "TABLE VIEW", dashboard: "REPORT VIEW" };
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
       {VIEWS.map((v) => {
@@ -537,7 +676,7 @@ function DotProgress({ active, progress, onDotClick }) {
           <button
             key={v}
             onClick={() => onDotClick(v)}
-            title={v === "table" ? "Table" : "Report"}
+            title={VIEW_LABELS[v]}
             style={{
               background: "none", border: "none", padding: 0,
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
@@ -545,9 +684,7 @@ function DotProgress({ active, progress, onDotClick }) {
             }}
           >
             <svg width="22" height="22">
-              {/* Track ring */}
               <circle cx="11" cy="11" r={RING_R} fill="none" stroke="#eeeeea" strokeWidth="2" />
-              {/* Progress arc — always rendered; on inactive it stays full-dashed (invisible) */}
               <circle
                 cx="11" cy="11" r={RING_R}
                 fill="none"
@@ -559,14 +696,12 @@ function DotProgress({ active, progress, onDotClick }) {
                 transform="rotate(-90 11 11)"
                 style={{ transition: "stroke-dashoffset 0.06s linear" }}
               />
-              {/* Inner dot */}
               <circle cx="11" cy="11" r="3" fill={isActive ? "#c7a74a" : "#d1d5db"} />
             </svg>
           </button>
         );
       })}
 
-      {/* Animated label */}
       <AnimatePresence mode="wait">
         <motion.span
           key={active}
@@ -579,7 +714,7 @@ function DotProgress({ active, progress, onDotClick }) {
             letterSpacing: "0.1em", userSelect: "none",
           }}
         >
-          {labels[active]}
+          {VIEW_LABELS[active]}
         </motion.span>
       </AnimatePresence>
     </div>
@@ -589,16 +724,30 @@ function DotProgress({ active, progress, onDotClick }) {
 /* ─────────────────────────────────────────────
    MAIN PREVIEW CARD
 ───────────────────────────────────────────── */
-const CARD_H = 436; // fixed height so both views match
+const CARD_H = 436;
 
 function PreviewCard() {
   const [view, setView] = useState("table");
   const [progress, setProgress] = useState(0);
+  const [terminalVisible, setTerminalVisible] = useState([]);
+
   const startRef = useRef(Date.now());
   const rafRef = useRef(null);
+  const termTimersRef = useRef([]);
 
-  // rAF ticker — drives both the arc and the auto-switch
-  useEffect(() => {
+  // Start terminal log timers — called whenever terminal view becomes active
+  const startTerminalTimers = () => {
+    // Clear any previous timers and reset lines
+    termTimersRef.current.forEach(clearTimeout);
+    setTerminalVisible([]);
+
+    termTimersRef.current = LOG_LINES.map((line, i) =>
+      setTimeout(() => setTerminalVisible(v => [...v, i]), line.t)
+    );
+  };
+
+  // rAF ticker
+  const startTicker = () => {
     const tick = () => {
       const elapsed = Date.now() - startRef.current;
       const p = Math.min(elapsed / AUTO_MS, 1);
@@ -606,37 +755,40 @@ function PreviewCard() {
       if (p < 1) {
         rafRef.current = requestAnimationFrame(tick);
       } else {
-        setView(v => (v === "table" ? "dashboard" : "table"));
+        setView(v => {
+          const idx = VIEWS.indexOf(v);
+          const next = VIEWS[(idx + 1) % VIEWS.length];
+          if (next === "terminal") startTerminalTimers();
+          return next;
+        });
         startRef.current = Date.now();
         setProgress(0);
         rafRef.current = requestAnimationFrame(tick);
       }
     };
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+  };
+
+  useEffect(() => {
+    startTicker();
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      termTimersRef.current.forEach(clearTimeout);
+    };
   }, []);
 
   const handleDotClick = (v) => {
     if (v === view) return;
     cancelAnimationFrame(rafRef.current);
+    termTimersRef.current.forEach(clearTimeout);
+
     setView(v);
     startRef.current = Date.now();
     setProgress(0);
-    // restart ticker
-    const tick = () => {
-      const elapsed = Date.now() - startRef.current;
-      const p = Math.min(elapsed / AUTO_MS, 1);
-      setProgress(p);
-      if (p < 1) {
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        setView(cur => (cur === "table" ? "dashboard" : "table"));
-        startRef.current = Date.now();
-        setProgress(0);
-        rafRef.current = requestAnimationFrame(tick);
-      }
-    };
-    rafRef.current = requestAnimationFrame(tick);
+
+    if (v === "terminal") startTerminalTimers();
+
+    startTicker();
   };
 
   return (
@@ -671,7 +823,7 @@ function PreviewCard() {
           <DotProgress active={view} progress={progress} onDotClick={handleDotClick} />
         </div>
 
-        {/* Fixed-height content area — crossfade, no gap between exit and enter */}
+        {/* Fixed-height content area */}
         <div style={{ position: "relative", height: `${CARD_H}px`, overflow: "hidden" }}>
           <AnimatePresence initial={false}>
             <motion.div
@@ -682,7 +834,9 @@ function PreviewCard() {
               transition={{ duration: 0.48, ease: [0.25, 0.46, 0.45, 0.94] }}
               style={{ position: "absolute", inset: 0 }}
             >
-              {view === "table" ? <TableView /> : <DashboardView />}
+              {view === "table"     && <TableView />}
+              {view === "dashboard" && <DashboardView />}
+              {view === "terminal"  && <TerminalView visibleLines={terminalVisible} />}
             </motion.div>
           </AnimatePresence>
         </div>
