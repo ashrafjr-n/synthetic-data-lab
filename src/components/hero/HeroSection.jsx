@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useNavigate } from "react-router-dom";
 import { useRef, useState, useEffect } from "react";
 import PreviewModal from "../live/PreviewModal";
-
+// import HeroParticles from "../layout/HeroParticles";
 
 /* ─────────────────────────────────────────────
    HERO SECTION
@@ -60,6 +60,7 @@ const EXAMPLE_CONFIG = {
       className="relative min-h-[720px] flex flex-col justify-center"
       style={{ overflow: "visible" }}
     >
+      {/* <HeroParticles /> */}
       <motion.div
         style={{ y, opacity, padding: "0 56px" }}
         className="relative grid lg:grid-cols-2 gap-20 items-center"
@@ -239,7 +240,7 @@ const EXAMPLE_CONFIG = {
    SPARKLINE
 ───────────────────────────────────────────── */
 function Sparkline({ color = "#c7a74a", values }) {
-  const w = 120, h = 40;
+  const w = 360, h = 18;
   const max = Math.max(...values);
   const min = Math.min(...values);
   const pts = values.map((v, i) => {
@@ -405,7 +406,115 @@ function TableView() {
     </div>
   );
 }
+/* ─────────────────────────────────────────────
+   ANIMATED SPARKLINE BADGE
+───────────────────────────────────────────── */
+function SparklineBadge() {
+  const [visible, setVisible] = useState(false);
+  const [arrowBounce, setArrowBounce] = useState(false);
 
+  useEffect(() => {
+    const t1 = setTimeout(() => setVisible(true), 1100);
+    const t2 = setTimeout(() => {
+      setArrowBounce(true);
+      setTimeout(() => setArrowBounce(false), 220);
+    }, 1300);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  return (
+    <motion.span
+      initial={{ opacity: 0, y: 6, scale: 0.82 }}
+      animate={visible ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 6, scale: 0.82 }}
+      transition={{ duration: 0.55, ease: [0.22, 0.68, 0, 1.4] }}
+      style={{ fontSize: "10px", color: "#c7a74a", fontWeight: "700",
+        display: "flex", alignItems: "center", gap: "2px" }}
+    >
+      <motion.span
+        animate={arrowBounce ? { y: -3 } : { y: 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+      >↑</motion.span>
+      12.4%
+    </motion.span>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATED SPARKLINE (draw-on reveal + larger)
+───────────────────────────────────────────── */
+function AnimatedSparkline({ color = "#c7a74a", values }) {
+  const pathRef = useRef(null);
+  const dotRef = useRef(null);
+  const [pathLen, setPathLen] = useState(0);
+
+  const w = 360, h = 32;
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const pts = values.map((v, i) => {
+    const x = (i / (values.length - 1)) * w;
+    const yp = h - ((v - min) / (max - min || 1)) * (h - 8) - 4;
+    return [x, yp];
+  });
+  const ptStr = pts.map(p => p.join(",")).join(" ");
+  const fillStr = `0,${h} ${ptStr} ${w},${h}`;
+  const lastPt = pts[pts.length - 1];
+  const gradId = `sg${color.replace(/[^a-z0-9]/gi, "")}anim`;
+
+  useEffect(() => {
+    if (pathRef.current) {
+      const len = pathRef.current.getTotalLength();
+      setPathLen(len);
+    }
+  }, []);
+
+  return (
+    <svg width="100%" viewBox={`0 0 ${w} ${h}`}
+      style={{ display: "block", overflow: "visible" }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* Fill area — fades in after line draws */}
+      <motion.polygon
+        points={fillStr}
+        fill={`url(#${gradId})`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.5 }}
+      />
+
+      {/* Line — draw-on animation via strokeDashoffset */}
+      <motion.polyline
+        ref={pathRef}
+        points={ptStr}
+        fill="none"
+        stroke={color}
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ strokeDasharray: pathLen || 600, strokeDashoffset: pathLen || 600 }}
+        animate={{ strokeDashoffset: 0 }}
+        transition={{ duration: 1.0, ease: "easeOut" }}
+        style={{ strokeDasharray: pathLen || 600 }}
+      />
+
+      {/* End dot — pops in after line finishes */}
+      <motion.circle
+        cx={lastPt[0]}
+        cy={lastPt[1]}
+        r="4"
+        fill={color}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.95, duration: 0.3, ease: [0.22, 0.68, 0, 1.4] }}
+        style={{ transformOrigin: `${lastPt[0]}px ${lastPt[1]}px` }}
+      />
+    </svg>
+  );
+}
 /* ─────────────────────────────────────────────
    VIEW B — DASHBOARD
 ───────────────────────────────────────────── */
@@ -452,14 +561,14 @@ function DashboardView() {
         ))}
       </div>
 
-      {/* Sparkline */}
-      <div style={{ background: "#fafaf8", border: "1px solid #f0f0ec", borderRadius: "14px", padding: "12px 14px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
-          <span style={{ fontSize: "11px", fontWeight: "600", color: "#374151" }}>Salary Distribution</span>
-          <span style={{ fontSize: "10px", color: "#c7a74a", fontWeight: "600" }}>↑ 12.4%</span>
-        </div>
-        <Sparkline values={sparkData} color="#c7a74a" />
-      </div>
+{/* Sparkline */}
+<div style={{ background: "#fafaf8", border: "1px solid #f0f0ec", borderRadius: "14px", padding: "8px 12px" }}>
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+    <span style={{ fontSize: "11px", fontWeight: "600", color: "#374151" }}>Salary Distribution</span>
+    <SparklineBadge />
+  </div>
+  <AnimatedSparkline values={sparkData} color="#c7a74a" />
+</div>
 
       {/* Feature importance */}
       <div style={{ background: "#fafaf8", border: "1px solid #f0f0ec", borderRadius: "14px", padding: "12px 14px" }}>
