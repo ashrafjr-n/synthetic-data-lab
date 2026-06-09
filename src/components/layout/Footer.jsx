@@ -1,33 +1,41 @@
+import { motion } from "framer-motion";
+
 function Footer() {
   return (
-    <footer className="w-full px-8 py-6">
-      <div className="container-app glass-card rounded-2xl px-6 py-4 flex items-center justify-between">
-
-        <span style={{ fontSize: "12px", color: "#b0b5bf", letterSpacing: "0.02em" }}>
+    <footer style={{
+      width: "100%",
+      padding: "24px 48px",
+      borderTop: "1px solid rgba(255,255,255,0.05)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}>
+      <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.22)" }}>
           © 2026 Synthetic Data Lab. All rights reserved.
         </span>
 
-        <a
+        <motion.a
           href="https://github.com/ashrafjr-n"
           target="_blank"
           rel="noopener noreferrer"
+          whileHover={{ borderColor: "rgba(212,175,55,0.45)", color: "#D4AF37" }}
           style={{
-            display: "flex", alignItems: "center", gap: "7px",
-            padding: "7px 14px", borderRadius: "100px",
-            border: "1px solid #e9eaec", background: "transparent",
-            textDecoration: "none", fontSize: "12px", fontWeight: "600",
-            color: "#374151", transition: "all 0.2s ease",
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.borderColor = "#c7a74a";
-            e.currentTarget.style.color = "#9a7a28";
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.borderColor = "#e9eaec";
-            e.currentTarget.style.color = "#374151";
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "6px 14px",
+            borderRadius: "100px",
+            border: "1px solid rgba(255,255,255,0.09)",
+            background: "transparent",
+            fontSize: "12px",
+            fontWeight: "600",
+            color: "rgba(255,255,255,0.4)",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            whiteSpace: "nowrap",
           }}
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577
               0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755
               -1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305
@@ -39,9 +47,7 @@ function Footer() {
               12c0-6.63-5.37-12-12-12z"/>
           </svg>
           ashrafjr-n
-        </a>
-
-      </div>
+        </motion.a>
     </footer>
   );
 }

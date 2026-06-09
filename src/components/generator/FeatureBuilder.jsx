@@ -2,8 +2,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import FeatureCard from "./FeatureCard";
 
-// ── Spring config for the section expand/collapse ──
 const SPRING = { type: "spring", stiffness: 340, damping: 32, mass: 0.9 };
+
+const LABEL_STYLE = {
+  fontSize: "11px", color: "rgba(255,255,255,0.3)",
+  display: "block", marginBottom: "8px",
+  fontWeight: "600", letterSpacing: "0.08em", textTransform: "uppercase",
+};
 
 function FeatureBuilder({
   features, setFeatures,
@@ -11,10 +16,10 @@ function FeatureBuilder({
   onGenerate,
   featureErrors = {},
   featureCountError = null,
+  clearFeatureCountError,
   clearFeatureError,
   flashFields = new Set(),
 }) {
-
   const addFeature = () => {
     setFeatures([...features, {
       id: Date.now(), name: "", type: "numeric",
@@ -33,59 +38,67 @@ function FeatureBuilder({
   const category = features.filter(f => f.type === "category").length;
   const binary   = features.filter(f => f.type === "binary").length;
 
+  const CARD_STYLE = {
+    background: "rgba(255,255,255,0.03)",
+    backdropFilter: "blur(16px)",
+    border: "1px solid rgba(255,255,255,0.07)",
+    borderRadius: "24px",
+    padding: "28px 32px",
+    boxShadow: "0 4px 40px rgba(0,0,0,0.3)",
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
       {/* ── Target Configuration ── */}
-      <div style={{
-        background: "rgba(255,255,255,0.85)",
-        backdropFilter: "blur(14px)",
-        border: "1px solid rgba(255,255,255,0.7)",
-        borderRadius: "24px",
-        padding: "28px 32px",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-      }}>
-        <div style={{ marginBottom: "20px" }}>
-          <p style={{ fontSize: "11px", color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 4px" }}>
-            Step 02
-          </p>
-          <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#0a0a0a", margin: 0 }}>
-            Target Configuration
-          </h2>
+      <div style={CARD_STYLE}>
+        <div style={{ marginBottom: "24px", display: "flex", alignItems: "center", gap: "14px" }}>
+          <div style={{
+            width: "32px", height: "32px", borderRadius: "10px",
+            background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "13px", color: "#D4AF37", flexShrink: 0,
+          }}>02</div>
+          <div>
+            <p style={{ fontSize: "10px", color: "rgba(212,175,55,0.5)", textTransform: "uppercase", letterSpacing: "0.22em", margin: "0 0 2px", fontFamily: "monospace" }}>
+              Step 02
+            </p>
+            <h2 style={{ fontSize: "16px", fontWeight: "600", color: "rgba(255,255,255,0.88)", margin: 0, letterSpacing: "-0.02em" }}>
+              Target Configuration
+            </h2>
+          </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
           <div>
-            <label style={{ fontSize: "12px", color: "#9ca3af", display: "block", marginBottom: "8px", fontWeight: "500" }}>Target Name</label>
-            {/* ── ملاحظة ثالثة: إزالة القيمة الافتراضية "Target" ── */}
+            <label style={LABEL_STYLE}>Target Name</label>
             <input
-              className="input"
-              maxLength={20}
+              className="builder-input"
               placeholder="e.g. approved"
               value={target.name}
+              maxLength={20}
               onChange={(e) => setTarget({ ...target, name: e.target.value })}
-              style={{ fontFamily: "monospace", fontSize: "14px" }}
             />
           </div>
           <div>
-            <label style={{ fontSize: "12px", color: "#9ca3af", display: "block", marginBottom: "8px", fontWeight: "500" }}>Target Type</label>
-            <select className="input" value={target.type} onChange={(e) => updateTargetType(e.target.value)} style={{ fontSize: "14px" }}>
+            <label style={LABEL_STYLE}>Target Type</label>
+            <select className="builder-select" value={target.type} onChange={(e) => updateTargetType(e.target.value)}>
               <option value="binary">Binary (2 classes)</option>
               <option value="multi">Multi-Class (3 classes)</option>
             </select>
           </div>
           <div>
-            <label style={{ fontSize: "12px", color: "#9ca3af", display: "block", marginBottom: "8px", fontWeight: "500" }}>Output Values</label>
+            <label style={LABEL_STYLE}>Output Values</label>
             {target.type === "binary" ? (
-              <select className="input" value={target.values}
-                onChange={(e) => setTarget({ ...target, values: e.target.value })} style={{ fontSize: "14px" }}>
+              <select className="builder-select" value={target.values}
+                onChange={(e) => setTarget({ ...target, values: e.target.value })}>
                 <option value="0,1">0 / 1</option>
                 <option value="yes,no">Yes / No</option>
                 <option value="true,false">True / False</option>
               </select>
             ) : (
-              <select className="input" value={target.values}
-                onChange={(e) => setTarget({ ...target, values: e.target.value })} style={{ fontSize: "14px" }}>
+              <select className="builder-select" value={target.values}
+                onChange={(e) => setTarget({ ...target, values: e.target.value })}>
                 <option value="0,1,2">0 / 1 / 2</option>
                 <option value="low,medium,high">Low / Medium / High</option>
               </select>
@@ -95,54 +108,48 @@ function FeatureBuilder({
       </div>
 
       {/* ── Feature Builder ── */}
-      {/*
-        ملاحظة ثانية: توسع/تضيق احترافي
-        - الـ grid يستخدم motion مع layoutRoot لتنسيق smooth للكارتات
-        - كل FeatureCard يدخل ويخرج بـ spring حقيقي
-        - ارتفاع الـ container يتمدد تلقائياً بـ framer layout animation
-      */}
-      <motion.div
-        layout
-        transition={SPRING}
-        style={{
-          background: "rgba(255,255,255,0.85)",
-          backdropFilter: "blur(14px)",
-          border: "1px solid rgba(255,255,255,0.7)",
-          borderRadius: "24px",
-          padding: "28px 32px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-          overflow: "hidden",
-        }}
-      >
+      <motion.div layout transition={SPRING} style={{ ...CARD_STYLE, overflow: "hidden" }}>
+
         {/* Header */}
         <motion.div layout="position" transition={SPRING} style={{
           display: "flex", alignItems: "flex-start", justifyContent: "space-between",
           marginBottom: "24px", flexWrap: "wrap", gap: "16px",
         }}>
-          <div>
-            <p style={{ fontSize: "11px", color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 4px" }}>
-              Step 03
-            </p>
-            <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#0a0a0a", margin: "0 0 4px" }}>
-              Feature Builder
-            </h2>
-            <p style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}>
-              Use clear, descriptive names — the AI reads them to build relationships
-            </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{
+              width: "32px", height: "32px", borderRadius: "10px",
+              background: "rgba(212,175,55,0.1)", border: "1px solid rgba(212,175,55,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "13px", color: "#D4AF37", flexShrink: 0,
+            }}>03</div>
+            <div>
+              <p style={{ fontSize: "10px", color: "rgba(212,175,55,0.5)", textTransform: "uppercase", letterSpacing: "0.22em", margin: "0 0 2px", fontFamily: "monospace" }}>
+                Step 03
+              </p>
+              <h2 style={{ fontSize: "16px", fontWeight: "600", color: "rgba(255,255,255,0.88)", margin: "0 0 2px", letterSpacing: "-0.02em" }}>
+                Feature Builder
+              </h2>
+              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)", margin: 0 }}>
+                Use clear names — the AI reads them to build relationships
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+            {/* Stats */}
+            <div style={{ display: "flex", gap: "6px" }}>
               {[
-                { label: "Total",    val: total,    color: "#0a0a0a" },
-                { label: "Numeric",  val: numeric,  color: "#3b82f6" },
-                { label: "Category", val: category, color: "#8b5cf6" },
-                { label: "Binary",   val: binary,   color: "#10b981" },
+                { label: "Total",    val: total,    color: "rgba(255,255,255,0.5)"  },
+                { label: "Numeric",  val: numeric,  color: "rgba(99,179,237,0.7)"  },
+                { label: "Category", val: category, color: "rgba(167,139,250,0.7)" },
+                { label: "Binary",   val: binary,   color: "rgba(74,222,128,0.7)"  },
               ].map((s, i) => (
                 <div key={i} style={{
-                  padding: "6px 12px", borderRadius: "10px",
-                  background: "rgba(0,0,0,0.04)", fontSize: "12px",
-                  fontWeight: "500", color: s.color,
+                  padding: "5px 10px", borderRadius: "8px",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  fontSize: "11px", fontWeight: "600", color: s.color,
+                  fontFamily: "monospace",
                 }}>
                   {s.label}: {s.val}
                 </div>
@@ -154,9 +161,12 @@ function FeatureBuilder({
               whileTap={{ scale: 0.97 }}
               onClick={addFeature}
               style={{
-                background: "#0a0a0a", color: "white", border: "none",
+                background: "rgba(212,175,55,0.12)",
+                color: "#D4AF37",
+                border: "1px solid rgba(212,175,55,0.25)",
                 borderRadius: "12px", padding: "10px 20px",
                 fontSize: "13px", fontWeight: "600", cursor: "pointer",
+                transition: "background 0.2s",
               }}
             >
               + Add Feature
@@ -164,7 +174,7 @@ function FeatureBuilder({
           </div>
         </motion.div>
 
-        {/* ── ملاحظة رابعة: رسالة خطأ عدد الـ features ── */}
+        {/* Feature count error */}
         <AnimatePresence>
           {featureCountError && (
             <motion.div
@@ -175,67 +185,49 @@ function FeatureBuilder({
               transition={{ duration: 0.22 }}
               style={{
                 display: "flex", alignItems: "center", gap: "8px",
-                background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)",
+                background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.18)",
                 borderRadius: "12px", padding: "10px 16px", overflow: "hidden",
               }}
             >
-              <span style={{ fontSize: "14px" }}>⚠️</span>
-              <span style={{ fontSize: "12.5px", color: "#dc2626", fontWeight: "500" }}>
+              <span style={{ fontSize: "13px" }}>⚠</span>
+              <span style={{ fontSize: "12.5px", color: "rgba(248,113,113,0.9)", fontWeight: "500" }}>
                 {featureCountError}
               </span>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Empty State */}
+        {/* Empty state */}
         <AnimatePresence>
           {features.length === 0 && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              style={{ textAlign: "center", padding: "60px 20px", color: "#d1d5db" }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              style={{ textAlign: "center", padding: "60px 20px", color: "rgba(255,255,255,0.12)" }}
             >
-              <div style={{ fontSize: "40px", marginBottom: "16px" }}>◈</div>
-              <p style={{ fontSize: "15px", fontWeight: "500", color: "#9ca3af", margin: "0 0 8px" }}>No features yet</p>
-              <p style={{ fontSize: "13px", color: "#d1d5db", margin: 0 }}>Add your first feature to start building</p>
+              <div style={{ fontSize: "36px", marginBottom: "14px", opacity: 0.4 }}>◈</div>
+              <p style={{ fontSize: "14px", fontWeight: "500", color: "rgba(255,255,255,0.2)", margin: "0 0 6px" }}>No features yet</p>
+              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.1)", margin: 0 }}>Add your first feature to start building</p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/*
-          ── ملاحظة ثانية: الـ Grid بـ layoutRoot ──
-          كل بطاقة تدخل/تخرج بـ spring ناعم، والـ grid يعيد ترتيب نفسه
-          بشكل animated بدون أي jump مفاجئ
-        */}
-        <motion.div
-          layout
-          transition={SPRING}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "16px",
-            alignItems: "start",
-          }}
-        >
+        {/* Feature grid */}
+        <motion.div layout transition={SPRING} style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+          gap: "14px", alignItems: "start",
+        }}>
           <AnimatePresence mode="popLayout">
             {features.map((feature, index) => (
               <motion.div
-                key={feature.id}
-                layout
+                key={feature.id} layout
                 initial={{ opacity: 0, scale: 0.88, y: 16 }}
-                animate={{ opacity: 1, scale: 1,    y: 0  }}
-                exit={{
-                  opacity: 0,
-                  scale: 0.88,
-                  y: -12,
-                  transition: { duration: 0.22, ease: [0.4, 0, 0.6, 1] }
-                }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.88, y: -12, transition: { duration: 0.22 } }}
                 transition={SPRING}
               >
                 <FeatureCard
-                  feature={feature}
-                  index={index}
+                  feature={feature} index={index}
                   removeFeature={removeFeature}
                   updateFeature={(id, key, val) => {
                     updateFeature(id, key, val);
@@ -254,36 +246,32 @@ function FeatureBuilder({
           {features.length > 0 && (
             <motion.div
               layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={SPRING}
               style={{
-                marginTop: "24px",
-                paddingTop: "20px",
-                borderTop: "1px solid rgba(0,0,0,0.06)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "16px",
+                marginTop: "24px", paddingTop: "20px",
+                borderTop: "1px solid rgba(255,255,255,0.06)",
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px",
               }}
             >
-              <p style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}>
+              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)", margin: 0, fontFamily: "monospace" }}>
                 {features.length} feature{features.length !== 1 ? "s" : ""} configured · ready to generate
               </p>
               <motion.button
-                whileHover={{ scale: 1.03, y: -2 }}
+                whileHover={{ scale: 1.03, y: -2, boxShadow: "0 12px 32px rgba(212,175,55,0.2)" }}
                 whileTap={{ scale: 0.97 }}
                 onClick={onGenerate}
                 style={{
-                  background: "#0a0a0a", color: "white", border: "none",
-                  borderRadius: "16px", padding: "14px 32px",
-                  fontSize: "14px", fontWeight: "600", cursor: "pointer",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                  background: "linear-gradient(135deg, #D4AF37, #C89B3C)",
+                  color: "#0B0B0B",
+                  border: "none", borderRadius: "14px", padding: "14px 32px",
+                  fontSize: "14px", fontWeight: "700", cursor: "pointer",
+                  boxShadow: "0 8px 24px rgba(212,175,55,0.18)",
                   display: "flex", alignItems: "center", gap: "8px",
+                  letterSpacing: "-0.01em",
                 }}
               >
-                <span style={{ color: "#c7a74a" }}>✦</span> Generate Dataset
+                <span>✦</span> Generate Dataset
               </motion.button>
             </motion.div>
           )}

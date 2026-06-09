@@ -1,12 +1,12 @@
-// src/components/layout/ScrollProgress.jsx
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SECTIONS = [
-  { id: "hero",     label: "Start" },
-  { id: "features", label: "Features" },
-  { id: "how",      label: "How It Works" },
-  { id: "cta",      label: "Get Started" },
+  { id: "hero",      label: "Discover" },
+  { id: "why",       label: "Insights" },
+  { id: "story",     label: "Workflow" },
+  { id: "generator", label: "Generate" },
+  { id: "cta",       label: "Analyze" },
 ];
 
 export function ScrollProgress() {
@@ -15,105 +15,146 @@ export function ScrollProgress() {
 
   useEffect(() => {
     const onScroll = () => {
-      setVisible(window.scrollY > 120);
+      setVisible(window.scrollY > 140);
 
-      // ← الإصلاح: getBoundingClientRect يعطي الموضع الحقيقي على الشاشة
       let current = "hero";
-      for (const s of SECTIONS) {
-        const el = document.getElementById(s.id);
+
+      for (const section of SECTIONS) {
+        const el = document.getElementById(section.id);
+
         if (!el) continue;
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.45) {
-          current = s.id;
+
+        if (
+          el.getBoundingClientRect().top <=
+          window.innerHeight * 0.45
+        ) {
+          current = section.id;
         }
       }
+
       setActive(current);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // تشغيل مرة عند التحميل
-    return () => window.removeEventListener("scroll", onScroll);
+    onScroll();
+
+    return () =>
+      window.removeEventListener("scroll", onScroll);
   }, []);
 
   const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById(id)
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
   };
 
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
+        <motion.nav
+          initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          exit={{ opacity: 0, x: 16 }}
+          transition={{
+            duration: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+          }}
           style={{
             position: "fixed",
-            right: "28px",
-            top: "50vh",
-            marginTop: "-52px",
-            zIndex: 50,
+            right: "24px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 200,
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
-            gap: "10px",
+            gap: "14px",
+            pointerEvents: "auto",
           }}
         >
-          {SECTIONS.map((s) => {
-            const isActive = active === s.id;
+          {SECTIONS.map((section) => {
+            const isActive = active === section.id;
+
             return (
               <button
-                key={s.id}
-                onClick={() => scrollTo(s.id)}
-                title={s.label}
+                key={section.id}
+                onClick={() => scrollTo(section.id)}
+                title={section.label}
                 style={{
                   all: "unset",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
-                  flexDirection: "row",
+                  gap: "10px",
                 }}
               >
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                   {isActive && (
                     <motion.span
-                      initial={{ opacity: 0, x: 6 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 6 }}
-                      transition={{ duration: 0.25 }}
+                      initial={{
+                        opacity: 0,
+                        x: 10,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        x: 10,
+                      }}
+                      transition={{
+                        duration: 0.22,
+                      }}
                       style={{
                         fontSize: "10px",
                         fontWeight: "600",
-                        color: "#9a7a28",
-                        letterSpacing: "0.1em",
+                        color: "#D4AF37",
+                        letterSpacing: "0.12em",
                         textTransform: "uppercase",
-                        background: "rgba(199,167,74,0.1)",
-                        border: "1px solid rgba(199,167,74,0.2)",
-                        padding: "3px 10px",
-                        borderRadius: "100px",
+                        background:
+                          "rgba(212,175,55,0.08)",
+                        border:
+                          "1px solid rgba(212,175,55,0.18)",
+                        padding: "4px 10px",
+                        borderRadius: "999px",
                         whiteSpace: "nowrap",
+                        backdropFilter: "blur(12px)",
+                        WebkitBackdropFilter: "blur(12px)",
                       }}
                     >
-                      {s.label}
+                      {section.label}
                     </motion.span>
                   )}
                 </AnimatePresence>
 
                 <motion.div
                   animate={{
-                    width:  isActive ? "28px" : "6px",
-                    height: "6px",
-                    background: isActive ? "#c7a74a" : "#d1d5db",
-                    boxShadow: isActive ? "0 0 10px rgba(199,167,74,0.5)" : "none",
+                    width: isActive ? 22 : 5,
+                    height: 5,
+                    background: isActive
+                      ? "#D4AF37"
+                      : "rgba(255,255,255,0.18)",
+                    boxShadow: isActive
+                      ? "0 0 10px rgba(212,175,55,0.55)"
+                      : "none",
                   }}
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ borderRadius: "6px", flexShrink: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  style={{
+                    borderRadius: "999px",
+                    flexShrink: 0,
+                  }}
                 />
               </button>
             );
           })}
-        </motion.div>
+        </motion.nav>
       )}
     </AnimatePresence>
   );
